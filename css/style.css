@@ -9,6 +9,9 @@ html, body{
 h1{
     font-size: 44px;
 }
+p{
+    font-size: 22px;
+}
 h1,p{
     color: cadetblue;
 }
@@ -23,6 +26,7 @@ span,{
 }
 .slide_d{
     text-align: center;
+    padding-top: 25%;
 }
 .slide_d p{
     color: slategray !important;
@@ -222,8 +226,8 @@ article img {
 #slide3:checked ~ #active label:nth-child(3),
 #slide4:checked ~ #active label:nth-child(4),
 #slide5:checked ~ #active label:nth-child(5) {
-    background: #333;
-    border-color: #333 !important;
+    background: cadetblue;
+    border-color: cadetblue !important;
 }
 /* Slider Styling */
 #slides {
