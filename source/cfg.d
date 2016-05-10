@@ -8,7 +8,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
- http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,9 +21,17 @@ module cfg;
 
 import std.path, std.stdio, std.file, std.string;
 
-string[string] load() {
+void createConfigDirectoriesIfNeeded() {
+  auto profiles = expandTilde("~/.vkcli/profiles/");
+  if (!profiles.exists) {
+    mkdirRecurse(profiles);
+  }
+}
+
+string[string] load(string profile) {
+  createConfigDirectoriesIfNeeded;
   string[string] storage;
-  auto config = expandTilde("~/.vkrc");
+  auto config = expandTilde("~/.vkcli/profiles/" ~ profile);
   if (config.exists) {
     auto f = File(config, "r");
     while (!f.eof) {
@@ -35,8 +43,9 @@ string[string] load() {
   return storage;
 }
 
-void save(string[string] stor) {
-  auto config = expandTilde("~/.vkrc");
+void save(string profile, string[string] stor) {
+  createConfigDirectoriesIfNeeded;
+  auto config = expandTilde("~/.vkcli/profiles/" ~ profile);
   auto f = File(config, "w");
   foreach(key, value; stor) {
     f.write(key ~ " = " ~ value ~ "\n");

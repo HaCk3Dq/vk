@@ -35,6 +35,7 @@ Win win;
 VkMan api;
 
 public:
+string selectedProfile; // which file we would use as settings storage
 
 struct ListElement {
   string name, text;
@@ -277,7 +278,7 @@ void update(ref string[string] storage) {
   storage["show_conv_notif"] = win.showConvNotifications.to!string;
   storage["send_online"] = win.sendOnline.to!string;
   storage["unicode_chars"] = win.unicodeChars.to!string;
-  storage.save;
+  save(selectedProfile, storage);
 }
 
 void init() {
@@ -295,6 +296,48 @@ void print(string s) {
 
 void print(int i) {
   i.to!string.toStringz.addstr;
+}
+
+void get_profile() {
+    createConfigDirectoriesIfNeeded;
+    import std.utf : byCodeUnit;
+    import std.file: isValidFilename, baseName, dirEntries, expandTilde, SpanMode;
+    import std.regex;
+    char profile_name;
+    string strprofile_name;
+    auto valid_name_regexp = regex(r"([a-z]|[A-Z]|[0-9])*"); // allow only basic latin and numbers
+    "p_select_profile".getLocal.print;
+    "\n".print;
+    "p_default_profile".getLocal.print;
+    "\n".print;
+    auto profileList = dirEntries(expandTilde("~/.vkcli/profiles/"), SpanMode.depth);
+    if(!profileList.walkLength) {
+        "p_empty_list".getLocal.print;
+        "\n".print;
+    } else {
+        profileList = dirEntries(expandTilde("~/.vkcli/profiles/"), SpanMode.depth);
+        foreach (entry; profileList) {
+            (" - " ~ baseName(entry)).print;
+            "\n".print;
+        }
+    }
+
+    echo;
+    getstr(&profile_name);
+    noecho;
+    strprofile_name = baseName((cast(char*)&profile_name).to!string);
+
+    if(strprofile_name == ""){
+        strprofile_name = "0";
+    }
+    if(!isValidFilename(strprofile_name.byCodeUnit) || !replaceAll(strprofile_name, valid_name_regexp, "").empty) {
+        // bad code; TODO: remove replaceAll
+        "p_incorrect_profile_name".getLocal.print;
+        "\n".print;
+        get_profile;
+    }else{
+        selectedProfile = strprofile_name;
+    }
 }
 
 VkMan get_token(ref string[string] storage) {
@@ -1010,8 +1053,8 @@ ListElement[] GetDialogs() {
   ListElement[] list;
   string newMsg;
   auto dialogs = api.getBufferedDialogs(LINES-2, win.scrollOffset);
-  
-  if (api.dialogsFactory.getBlockObject(win.scrollOffset) !is null && dialogs.length != LINES-2 && activeBufferMaxLen > LINES-2) 
+
+  if (api.dialogsFactory.getBlockObject(win.scrollOffset) !is null && dialogs.length != LINES-2 && activeBufferMaxLen > LINES-2)
     dialogs = api.getBufferedDialogs(LINES-2, win.scrollOffset-(LINES-2-dialogs.length).to!int);
 
   foreach(e; dialogs) {
@@ -1041,10 +1084,10 @@ ListElement[] GetFriends() {
   win.activeBuffer = Buffers.friends;
   auto friends = api.getBufferedFriends(LINES-2, win.scrollOffset);
 
-  if (api.friendsFactory.getBlockObject(win.scrollOffset) !is null && friends.length != LINES-2 && activeBufferMaxLen > LINES-2) 
+  if (api.friendsFactory.getBlockObject(win.scrollOffset) !is null && friends.length != LINES-2 && activeBufferMaxLen > LINES-2)
     friends = api.getBufferedFriends(LINES-2, win.scrollOffset-(LINES-2-friends.length).to!int);
-  
-  foreach(e; friends) 
+
+  foreach(e; friends)
     list ~= ListElement(e.first_name ~ " " ~ e.last_name, e.last_seen_str, &chat, &GetChat, e.online, e.id);
   return list;
 }
@@ -1071,7 +1114,7 @@ ListElement[] GetMusic() {
   music = api.getBufferedMusic(LINES-2-win.isMusicPlaying*4, win.scrollOffset);
   win.playerUI = mplayer.getMplayerUI(COLS);
 
-  if (api.musicFactory.getBlockObject(win.scrollOffset) !is null && music.length != LINES-2-win.isMusicPlaying*4 && activeBufferMaxLen > LINES-2) 
+  if (api.musicFactory.getBlockObject(win.scrollOffset) !is null && music.length != LINES-2-win.isMusicPlaying*4 && activeBufferMaxLen > LINES-2)
     music = api.getBufferedMusic(LINES-2-win.isMusicPlaying*4, win.scrollOffset-(LINES-2-music.length-win.isMusicPlaying*5).to!int);
 
   foreach(e; music) {
@@ -1120,7 +1163,7 @@ ListElement[] GetChat() {
 void test() {
     //initFileDbm();
     localize();
-    auto storage = load;
+    auto storage = load(selectedProfile);
     if("token" !in storage) {
         writeln("cyka");
         return;
@@ -1167,7 +1210,9 @@ void main(string[] args) {
   scope(exit)    endwin;
   scope(failure) endwin;
 
-  storage = load;
+  // Profiles
+  get_profile;
+  storage = load(selectedProfile);
   storage.parse;
 
   try {
@@ -1178,11 +1223,12 @@ void main(string[] args) {
     exit(0);
   }
 
+  // save storage immadiately
+  storage.update;
   mplayer = new MusicPlayer;
   mplayer.startPlayer(api);
   api.showConvNotifications(win.showConvNotifications);
   api.sendOnline(win.sendOnline);
-
   while (!canFind(kg_esc, win.key) || win.isMessageWriting) {
     clear;
     statusbar;

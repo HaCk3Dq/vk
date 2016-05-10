@@ -45,7 +45,11 @@ void localize() {
   local["e_token_link"] = lang("Follow this link to get your access_token: ", "Перейдите по следующей ссылке, чтобы получить ваш access_token: ");
   local["e_token_info"] = lang("Please allow access to your data and then copy link from the address bar.", "Пожалуйста, разрешите приложению доступ к вашим данным, а затем скопируйте содержимое адресной строки.");
   local["e_input_token"] = lang("Insert your link here: ", "Вставьте адрес из браузера сюда:  ");
-  local["e_wrong_token"] = lang("Wrong token, try again\n", "Неверный access token, попробуйте еще раз");
+  local["e_wrong_token"] = lang("Wrong token, try again\n", "Неверный access token, попробуйте еще раз\n");
+  local["p_select_profile"] = lang("Select profile from the list below or type new profile name to create one (only latin and nubers allowed).", "Выберите профиль из списка ниже или введите новое имя чтобы создать ещё один (в имени может содержаться только латиница и цифры).");
+  local["p_default_profile"] = lang("[Enter] - use default profile", "[Enter] - использовать профиль по умолчанию");
+  local["p_incorrect_profile_name"] = lang("Incorrect profile name.", "Некорректное имя профиля.");
+  local["p_empty_list"] = lang("<List is empty>", "<Список пуст>");
   local["m_friends"] = lang("Friends", "Друзья");
   local["m_conversations"] = lang("Conversations", "Диалоги");
   local["m_music"] = lang("Music", "Музыка");
