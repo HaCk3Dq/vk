@@ -29,6 +29,7 @@ struct lang {
 const int
   En = 0,
   Ru = 1;
+  Ua = 2;
 
 __gshared {
   private lang[string] local;
@@ -69,7 +70,7 @@ void localize() {
   local["msg_setting0"] = lang("show everything", "показывать всё", "показувати все");
   local["msg_setting1"] = lang("show the selected text only", "текст только выделенного диалога", "текст тільки виділеного діалогу");
   local["msg_setting2"] = lang("show the selected text and unread ones", "текст выделенного диалога и всех непрочитанных", "текст виділеного діалогу і всіх непрочитаних");
-  local["loading"] = lang("Loading", "Загрузка", "Завантаження", "Завантаження");
+  local["loading"] = lang("Loading", "Загрузка", "Завантаження");
   local["general_navig"] = lang("[ General navigation ]", "[ Общее управление ]", "[ Загальне управління ]");
   local["help_move"]   = lang("Arrow keys, WASD, HJKL         ->   Move cursor", "Стрелки, WASD, HJKL           ->   Двигать курсор", "Стрілки, WASD, HJKL      ->   Переміщати курсор");
   local["help_select"] = lang("Enter, right arrow key, D, L   ->   Select item", "Enter, стрелка вправо, D, L   ->   Выбрать элемент", "Enter, стрілка вправо, D, L      ->   Вибрати елемент");
