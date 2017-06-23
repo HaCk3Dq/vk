@@ -503,7 +503,8 @@ void bodyToBuffer() {
   if (win.activeBuffer != Buffers.chat) {
     foreach(i, e; win.buffer) {
       if (e.name.utfLength.to!int + win.menuOffset+1 > COLS)
-        win.buffer[i].name = e.name.to!wstring[0..COLS-win.menuOffset-1].to!string;
+	try{ win.buffer[i].name = e.name.to!wstring[0..COLS-win.menuOffset-1].to!string;}
+	catch(Throwable){}
       else
         win.buffer[i].name ~= " ".replicatestr(COLS - e.name.utfLength - win.menuOffset-1);
     }
