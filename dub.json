@@ -24,6 +24,10 @@
       "name": "release-static",
       "buildRequirements": ["silenceDeprecations"],
       "lflags": ["-Bstatic"]
+    },
+    {
+      "name": "library",
+      "targetType": "library"
     }
   ]
 }
